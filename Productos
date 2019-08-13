@@ -1,0 +1,49 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package finaldam;
+
+/**
+ *
+ * @author ibai
+ */
+public class Usuarios {
+    
+    private String User;
+    private String Pass;
+    private int tipo;
+    
+    public Usuarios(String User, String Pass, int Tipo) {
+        this.User = User;
+        this.Pass = Pass;
+        this.tipo = Tipo;
+    }
+    public Usuarios(){
+        this.User="Desconocido";
+        this.Pass="Desconocido";
+        this.tipo=0;           
+    }
+    
+    public String getUser() {
+        return this.User;
+    }
+    public void setUser(String User) {
+        this.User = User;
+    }
+    
+    public String getPass() {
+        return this.Pass;
+    }
+    public void setPass(String Pass) {
+        this.Pass = Pass;
+    }
+    
+    public int getTipo() {
+        return this.tipo;
+    }
+    public void setTipo(int Tipo) {
+        this.tipo = Tipo;
+    }
+}
