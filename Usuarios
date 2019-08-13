@@ -1,0 +1,51 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package finaldam;
+
+/**
+ *
+ * @author ibai
+ */
+public class Productos {
+    
+    
+    private String nombre;
+    private float precio;
+    private float peso;
+    
+    private Productos(String nombre, float precio, float peso) {
+       
+        this.nombre = nombre;
+        this.precio = precio;
+        this.peso = peso;
+    }
+    public Productos(){
+        this.nombre="Desconocido";
+        this.precio=0;
+        this.peso=0;
+    }
+    
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String Nombre) {
+        this.nombre = Nombre;
+    }
+    
+    public float getPrecio() {
+        return precio;
+    }
+    public void setPrecio(float Precio) {
+        this.precio = Precio;
+    }
+    
+    public float getPeso() {
+        return peso;
+    }
+    public void setPeso(float Peso) {
+        this.peso = Peso;
+    }
+}
