@@ -1,0 +1,325 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package finaldam;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+/**
+ *
+ * @author ibai
+ */
+public class FinalDam {
+
+    /**
+     * @param args the command line arguments
+     */
+          
+    static Scanner sc = new Scanner(System.in);
+    
+    static Productos[] listProd= new Productos[100]; 
+    static Usuarios[] listUser= new Usuarios[100];
+    static int nUser;
+    static int nProd;
+    
+    //var producto                  
+    static String nombre = "Desconocido";
+    static float peso = 0;    
+    static float precio = 0;
+    //var usuario    
+    static String User = "Desconocido";
+    static String Pass = "Desconocido";           
+    static int tipo = 0;
+    
+    public static void main(String[] args) throws SQLException, IOException {
+        // TODO code application logic here
+        MenuPrincipal();
+        
+    }
+    static void MenuPrincipal() throws SQLException, IOException{
+        int opcion;
+        Scanner teclado = new Scanner(System.in);
+        do{
+            do{
+                System.out.println("Que quieres hacer \n");
+                System.out.println("1. Login \n");
+                System.out.println("2. Registrarse \n");
+                System.out.println("3. Salir \n");
+                opcion=teclado.nextInt();            
+            }while(opcion<1 || opcion>=4);
+            switch (opcion){
+                case 1:
+                    System.out.println("Login");
+                    login();
+                    break;
+                case 2:
+                    System.out.println("Registrarse");
+                    registrarse();
+                    break;
+                case 3:
+                    System.out.println("Gracias por venir");
+            }
+        }while(opcion == 2);
+    }
+    static void registrarse() throws SQLException{
+       
+        int cierraWhile = 0;        
+        while(nUser<listUser.length && cierraWhile != 1){
+            Usuarios U = new Usuarios();        		
+            System.out.println("Introduzca sus datos. ");
+            System.out.println("Nombre de usuario: ");
+                User = sc.next();
+            System.out.println("Contraseña: ");
+                Pass = sc.next();
+                tipo = 2;						
+
+            U.setUser(User);
+            U.setPass(Pass);
+            U.setTipo(tipo);
+            listUser[nUser]= U ;			
+            nUser++;	
+
+            if(nUser==listUser.length){
+                System.out.println("Almacenamiento lleno.");
+            }
+				
+            System.out.println("¿Quiere dejar de introducir usuarios? teclée: 1 = sí ,0 = no.");
+            cierraWhile = sc.nextInt();              
+        }
+        //Guardar usuario
+        System.out.println("Guardando el usuario en: Usuarios.txt");
+        try{        
+            File nombreFichero = new File("Usuarios.txt");
+            FileWriter fw = new FileWriter(nombreFichero,true);       
+            BufferedWriter bw = new BufferedWriter(fw);        
+            PrintWriter pw = new PrintWriter(bw);
+
+            for (int i = 0; i < nUser; i++) {              
+                pw.println(listUser[i].getUser()+" "+listUser[i].getPass()+" "+listUser[i].getTipo());
+            }pw.close();
+
+        }catch(IOException ioe){
+            System.out.println("No se ha podido guardar. Error: "+ ioe);
+        }
+    }
+    static void login() throws SQLException, FileNotFoundException, IOException{
+        
+        System.out.println("Introduce tu usuario");
+        String user = sc.next();
+        System.out.println("Introduce tu pass");
+        String pass = sc.next();
+        
+        String nombreFichero = "Usuarios.txt";
+        File fichero = new File(nombreFichero);
+        
+        if(fichero.exists()){               
+
+            FileReader fr = new FileReader(nombreFichero);
+            BufferedReader bf = new BufferedReader(fr);        
+            boolean encontrado=false;
+            while ((nombreFichero = bf.readLine())!=null) { 
+                String[] datos = nombreFichero.split(" ");
+
+                if (datos[0].equals(user) && datos[1].equals(pass)) {
+                    encontrado=true;
+                    System.out.println("Bienvenido " +user);  
+                    switch (datos[2]){
+                        case "1":
+                            MenuAdmin();
+                        break;
+                        case "2":
+                            MenuUsuario();
+                        break;
+                    }
+                }                   
+            }bf.close();   
+            if (encontrado) {                
+            }else{
+                System.out.println("Usuario o contraseña incorrectos.");
+                login();
+            }
+        }            
+    }
+    static void MenuAdmin() throws SQLException, IOException{
+        int opcion=0;
+        Scanner teclado = new Scanner(System.in);
+        do{
+            do{
+                System.out.println("1. Introducir Productos");
+                System.out.println("2. Introducir nuevo administrador o usuario");
+                System.out.println("3. Ver productos");
+                System.out.println("4. Salir");
+                opcion = teclado.nextInt();
+            }while(opcion<0 || opcion>4);
+            switch(opcion){
+                case 1:
+                    introduceProd();
+                    break;
+                case 2:
+                    introduceAdmin();
+                    break;
+                case 3:
+                    VerProductos();
+            }
+        }while(opcion !=4);    
+    }
+    static void MenuUsuario() throws SQLException, IOException{
+        int opcion=0;
+        Scanner teclado = new Scanner(System.in);
+        do{
+            do{
+                System.out.println("1. Ver productos");
+                System.out.println("2. Salir");
+                opcion = teclado.nextInt();
+            }while(opcion<0 || opcion>2);
+            switch(opcion){
+                case 1:
+                    VerProductos();
+                    break;
+            }
+        }while(opcion !=2);   
+    }
+    static void introduceProd() throws SQLException{
+        int opcion=0;
+        Scanner teclado = new Scanner(System.in);
+        
+        while(nProd<listProd.length && opcion != 1){
+            Productos P = new Productos();        		
+            System.out.println("Introduzca las variables del nuevo producto.");
+            
+                System.out.println("Nombre del producto");
+                nombre = teclado.next();
+                
+            try{
+                System.out.println("Precio (solo numeros decimales):");
+                precio = sc.nextFloat();
+
+            }catch(InputMismatchException ime){
+                System.out.println("¡Cuidado! Solo puedes insertar números decimales. " + ime);
+                sc.next();
+            }
+            		
+            try{
+                System.out.println("Peso (solo numeros decimales):");
+                peso = sc.nextFloat();
+
+            }catch(InputMismatchException ime){
+                System.out.println("¡Cuidado! Solo puedes insertar números decimales. " + ime);
+                sc.next();
+            }         
+
+            P.setNombre(nombre);
+            P.setPrecio(precio);
+            P.setPeso(peso);
+            
+            listProd[nProd]= P ; 
+            nProd++;	
+            //Guardar, escribir prodctos a txt
+            System.out.println("Guardando los productos en: Productos.txt");
+            try{        
+                File nombreFichero = new File("Productos.txt");
+                FileWriter fw = new FileWriter(nombreFichero,true);       
+                BufferedWriter bw = new BufferedWriter(fw);        
+                PrintWriter pw = new PrintWriter(bw);
+
+                    for (int i = 0; i < nProd; i++) {               
+                        pw.println("Nombre: ");     pw.println(listProd[i].getNombre());
+                        pw.println("Precio: ");     pw.println(listProd[i].getPrecio());
+                        pw.println("Peso: ");       pw.println(listProd[i].getPeso());
+                        pw.println("-----------");
+                    }pw.close();
+
+            }catch(IOException ioe){
+                System.out.println("No se ha podido guardar. Error: "+ ioe);
+            }           
+            
+            if(nProd==listProd.length){
+                System.out.println("Almacenamiento lleno.");
+            }
+                System.out.println("¿Quiere dejar de introducir productos? teclée: 1 = sí ,0 = no.");
+                opcion = teclado.nextInt();                         								
+        }
+    }
+    static void introduceAdmin() throws SQLException{
+        int opcion=0;
+        int cierraWhile = 0;
+        
+        do{     
+            while(nUser<listUser.length && cierraWhile != 1){
+                Usuarios U = new Usuarios();        		
+                System.out.println("Introduzca los datos. ");
+                System.out.println("Nombre del nuevo usuario: ");
+                        User = sc.next();
+                System.out.println("Contraseña : ");
+                        Pass = sc.next();
+                try{
+                    System.out.println("Nuevo administrador pulse 1, usuario normal pulse 2.");
+                    tipo = sc.nextInt();
+				
+                }catch (InputMismatchException ime){
+                    System.out.println("¡Cuidado! Solo puedes insertar números. "+ime);
+                    sc.next();
+                }
+                U.setUser(User);
+                U.setPass(Pass);
+                U.setTipo(tipo);
+                listUser[nUser]= U ;			
+                nUser++;	
+
+                if(nUser==listUser.length){
+                    System.out.println("Almacenamiento lleno.");
+                }
+
+                System.out.println("¿Quiere dejar de introducir usuarios? teclée: 1 = sí ,0 = no.");
+                cierraWhile = sc.nextInt();              
+            }
+            //Guardar,escribir usuario
+            System.out.println("Guardando el usuario en: Usuarios.txt");
+            try{        
+                File nombreFichero = new File("Usuarios.txt");
+                FileWriter fw = new FileWriter(nombreFichero,true);       
+                BufferedWriter bw = new BufferedWriter(fw);        
+                PrintWriter pw = new PrintWriter(bw);
+
+                for (int i = 0; i < nUser; i++) {             
+                    pw.println(listUser[i].getUser()+" "+listUser[i].getPass()+" "+listUser[i].getTipo());
+
+                }pw.close();
+
+            }catch(IOException ioe){
+                System.out.println("No se ha podido guardar. Error: "+ ioe);
+            }
+        }while(opcion==1);
+    }
+    static void VerProductos() throws SQLException, FileNotFoundException, IOException{
+        
+        String nombreFichero = "Productos.txt";
+        File fichero = new File(nombreFichero);
+        
+        if(fichero.exists()){               
+
+            FileReader fr = new FileReader(nombreFichero);
+            BufferedReader bf = new BufferedReader(fr);        
+
+            while ((nombreFichero = bf.readLine())!=null) { 
+               System.out.println(nombreFichero);
+            }bf.close();
+
+        }else{
+            System.out.println("Aún no se ha guardado ningún producto. "
+                    + "Vuelva a la opción 1 y guarde algún producto para ejecutar esta función."); 
+        }
+    }
+}
